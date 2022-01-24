@@ -11,9 +11,9 @@ const port = process.env.PORT || 4000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// app.get('/', (req, res) => {
-//   res.send(`Running a GraphQL API server at http://localhost:${port}/graphql`);
-// });
+app.get('/', (req, res) => {
+  res.send(`Running a GraphQL API server at http://localhost:${port}/graphql`);
+});
 
 app.use(
   '/graphql',

@@ -1,11 +1,7 @@
+// Config.js file to keep my secrets
 const config = {};
 
-
-
-
-
-
-config.githubToken = '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';
-config.githubUsername = 'BarVarsano'; // not secret just saves putting in a few places
+config.githubToken = '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';
+config.githubUsername = 'BarVarsano';
 
 module.exports = config;

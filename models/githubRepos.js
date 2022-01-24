@@ -1,60 +1,79 @@
 
 const axios = require('axios');
+const _ = require('lodash');
 const config = require('../config');
 
 const GITHUB_USERNAME = config.githubUsername;
 const GITHUB_TOKEN = config.githubToken;
 
-async function getGitHubRepos() {
+
+function _customizeReposList({ name, size, owner: { login } }) {
+    return {
+        name,               // 1.Repo name
+        size,               // 2.Repo size
+        owner: login,       // 3.Repo owner
+    }
+}
+
+async function getGitHubReposForUser(username = GITHUB_USERNAME) {
     try {
         const response = await axios({
-            method: "get",
-            url: `https://api.github.com/users/${GITHUB_USERNAME}/repos`,
+            method: 'get',
+            url: `https://api.github.com/users/${username}/repos`,
             headers: {
                 Authorization: `Bearer ${GITHUB_TOKEN}`,
-                "Content-Type": "application/json",
-                "Accept": "application/vnd.github.mercy-preview+json" // MUST ADD TO INCLUDE TOPICS
+                'Content-Type': 'application/json',
+                Accept: 'application/vnd.github.mercy-preview+json'
             }
-        })
-
-        return response.data;
-
-        // const data = [];
-        // response.data.forEach(repo => {
-        //     const {
-        //         name, // 1.Repo name
-        //         size, // 2.Repo size
-        //         owner: { login }, // 3.Repo owner`
-        //         private, // 4.Private\public repo
-        //     } = repo;
-        //     const details = {
-        //         name,
-        //         size,
-        //         owner: login,
-        //         isPrivate: private
-        //     };
-        //     data.push(details);
-
-        //     /*
-        //       1.Repo name
-        //       2.Repo size
-        //       3.Repo owner
-        //       4.Private\public repo
-        //       5.Number of files in the repo
-        //       6.Content of 1 yml file (any one that appear in the repo)
-        //       7.Ative webhooks
-        //     */
-        // });
-
-        // return data;
-
+        });
+        
+        return _.map(response.data, _customizeReposList);
     } catch (err) {
         console.log(err.message || err);
         throw err;
     }
 }
 
+function _customizeRepoDetails({
+    name,
+    size,
+    owner: { login },
+    visibility,
+}) {
+    return {
+        name,                                       // 1. Repo name       
+        size,                                       // 2. Repo size
+        owner: login,                               // 3. Repo owner
+        visibility,                                 // 4. Private\public repo                   
+        filesAmount: 999,                           // ** 5. Number of files in the repo                            
+        content: 'test content',                    // ** 6. Content of 1 yml file (any one that appear in the repo)          
+        ativeWebhooks: 'test ativeWebhooks'         // ** 7. Ative webhooks
+    }
+}
+
+async function getGitHubRepo(owner = GITHUB_USERNAME, repoName) {
+    try {
+        const response = await axios({
+            method: 'get',
+            url: `https://api.github.com/repos/${owner}/${repoName}`,
+            headers: {
+                Authorization: `Bearer ${GITHUB_TOKEN}`,
+                'Content-Type': 'application/json',
+                Accept: 'application/vnd.github.mercy-preview+json'
+            }
+        });
+
+        return _customizeRepoDetails(response.data);
+    } catch (err) {
+        if (err.response && err.response.status === 404) {
+            throw new Error('Resource not found');
+        }
+
+        throw err;
+    }
+}
+
 module.exports = {
-    getGitHubRepos,
-    // getGitHubData
+    getGitHubRepo,
+    getGitHubReposForUser,
 };

@@ -1,21 +1,29 @@
 
-const { getGitHubRepos } = require('../../models/githubRepos');
+const { getGitHubRepo, getGitHubReposForUser } = require('../../models/githubRepos');
+const _ = require('lodash');
 
 module.exports = {
-  repos: () => {'test'},
-  // repos: async () => {
-  //   try {
-  //     const repos = await getGitHubRepos();
-  //     return repos.map(repo => {
-  //       return {
-  //         _id: repo.id,
-  //         name: repo.name,
-  //         size: repo.size,
-  //         owner: repo.owner.login,
-  //       }
-  //     })
-  //   } catch (err) {
-  //     throw err;
-  //   }
-  // },
+  repo: async args => {
+    try {
+      const owner = args && args.repoInput && args.repoInput.owner;
+      const repoName = args && args.repoInput && args.repoInput.name;
+      
+      const repo = await getGitHubRepo(owner, repoName);
+
+      return repo;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
+  repos: async args => {
+    try {
+      const username = args && args.reposInput && args.reposInput.owner;
+
+      return getGitHubReposForUser(username);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
 };
