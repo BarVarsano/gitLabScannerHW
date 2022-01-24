@@ -3,17 +3,17 @@ const { buildSchema } = require('graphql');
 module.exports = buildSchema(`
 type RepoDetails {
   name: String!
-  size: Int
+  size: Int!
   owner: String!
   visibility: String!
   filesAmount: Int
-  content: String!
-  ativeWebhooks: String!
+  content: String
+  ativeWebhooks: String
 }
 
 type RepoListItem {
   name: String!
-  size: Int
+  size: Int!
   owner: String!
 }
 

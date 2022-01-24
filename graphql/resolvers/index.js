@@ -5,8 +5,12 @@ const _ = require('lodash');
 module.exports = {
   repo: async args => {
     try {
-      const owner = args && args.repoInput && args.repoInput.owner;
-      const repoName = args && args.repoInput && args.repoInput.name;
+      let owner, repoName;
+      
+      if (args && args.repoInput) {
+        owner = args.repoInput.owner;
+        repoName = args.repoInput.name;
+      }
       
       const repo = await getGitHubRepo(owner, repoName);
 
